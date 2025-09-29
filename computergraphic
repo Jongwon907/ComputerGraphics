@@ -1,0 +1,1646 @@
+#include <iostream>
+#include <OpenGL/OpenGL.h>
+#include <stdio.h>
+#include <GLUT/GLUT.h>
+#include <stdlib.h>
+
+GLfloat SteveX;     //스티브 x좌표값
+GLfloat PigX = 1;   //돼지 x좌표값
+GLfloat BearX = 1.5; //북극곰 좌표
+GLfloat angle1, angle2;     //스티브 angle
+GLfloat pigangle1, pigangle2, pigangle3;  //돼지 angle
+GLfloat bearangle1, bearangle2, bearangle3;  //북극곰 angle
+GLfloat anglePlus = 3;      //스티브 angle plus
+GLfloat piganglePlus = 3;  //돼지 anglePlus
+GLfloat BearAnglePlus = 3; //북극곰 anglePluse
+GLfloat SnowX, SnowY; //눈의 x,y,speed
+GLfloat angle;
+GLfloat RabbitHead[8][3] = {
+    {-0.01, -0.008, 0.01 },
+    {-0.01, 0.008, 0.01 },
+    {0.01, 0.008, 0.01 },
+    {0.01, -0.008, 0.01 },
+    {-0.01, -0.008, -0.01 },
+    {-0.01, 0.008, -0.01 },
+    {0.01, 0.008, -0.01 },
+    {0.01, -0.008, -0.01 }
+};
+
+GLfloat RabbitLeftEar[8][3] = {
+    {0.01, -0.008, -0.006 },
+    {0.01, -0.028, -0.006 },
+    {0.002, -0.028, -0.006 },
+    {0.002, -0.008, -0.006 },
+    {0.01, -0.008, -0.01 },
+    {0.01, -0.028, -0.01 },
+    {0.002, -0.028, -0.01 },
+    {0.002, -0.008, -0.01 }
+};
+
+GLfloat RabbitRightEar[8][3] = {
+    {-0.01, -0.008, -0.006 },
+    {-0.01, -0.028, -0.006 },
+    {-0.002, -0.028, -0.006 },
+    {-0.002, -0.008, -0.006 },
+    {-0.01, -0.008, -0.01 },
+    {-0.01, -0.028, -0.01 },
+    {-0.002, -0.028, -0.01 },
+    {-0.002, -0.008, -0.01 }
+};
+
+GLfloat RabbitRightarm[8][3] = {
+    {0.015, 0.0038, -0.01 },
+    {0.015, 0.01, -0.01 },
+    {0.007, 0.01, -0.01 },
+    {0.007, 0.038, -0.01 },
+    {0.015, 0.038, -0.014 },
+    {0.015, 0.01, -0.014 },
+    {0.007, 0.01, -0.014 },
+    {0.007, 0.038, -0.014 }
+};
+
+GLfloat RabbitLeftarm[8][3] = {
+    {-0.007, 0.0038, -0.01 },
+    {-0.007, 0.01, -0.01 },
+    {-0.015, 0.01, -0.01 },
+    {-0.015, 0.038, -0.01 },
+    {-0.007, 0.038, -0.014 },
+    {-0.007, 0.01, -0.014 },
+    {-0.015, 0.01, -0.014 },
+    {-0.015, 0.038, -0.014 }
+};
+
+GLfloat RabbitBody[8][3] = {
+    {0.011, 0, -0.05 },
+    {0.011, 0.026, -0.05 },
+    {-0.011, 0.026, -0.05 },
+    {-0.011, 0, -0.05 },
+    {0.011, -0.008, -0.01 },
+    {0.011, 0.018, -0.01 },
+    {-0.011, 0.018, -0.01 },
+    {-0.011, -0.008, -0.01 }
+};
+
+GLfloat RabbitRightfoot[8][3] = {
+    {-0.015, 0.022, -0.048 },
+    {-0.015, 0.026, -0.048 },
+    {-0.007, 0.026, -0.048 },
+    {-0.007, 0.022, -0.048 },
+    {-0.015, 0.034, -0.020 },
+    {-0.015, 0.038, -0.020 },
+    {-0.007, 0.038, -0.020 },
+    {-0.007, 0.034, -0.020 }
+};
+
+GLfloat RabbitLeftfoot[8][3] = {
+    {0.015, 0.026, -0.048 },
+    {0.015, 0.022, -0.048 },
+    {0.007, 0.026, -0.048 },
+    {0.007, 0.022, -0.048 },
+    {0.015, 0.034, -0.020 },
+    {0.015, 0.038, -0.020 },
+    {0.007, 0.038, -0.020 },
+    {0.007, 0.034, -0.020 }
+};
+GLfloat CreepX, CloudX;
+GLfloat CreepR = 0.17;
+GLfloat CreepG = 0.8;
+GLfloat CreepB = 0;
+
+GLint steveH[8][8]; //스티브머리
+GLint steveB[20][20];
+GLint dirt[20][20];  //흙
+GLint sand[20][20];
+GLint glass[20][20]; //잔디
+GLint wood2[20][20];  //나무
+GLint leaf[20][20];  //잎
+GLint vine[20][20];  //덩쿨
+GLint sea[20][20];   //바다
+GLint ice[20][20];   //얼음
+GLint SceneNumber = 0;  //씬전환용
+GLint stone[20][20];
+GLint wood[20][20];
+GLint rewood[20][20];
+GLint diamond[20][20];
+GLint iron[20][20];
+GLint cactus[20][20];
+GLint emerald[20][20];
+GLint cloud[20][20];
+GLint Timer;
+GLfloat CreepPSize;
+GLfloat CreepLSize;
+GLfloat BombSize;
+GLfloat BombX;
+GLfloat BombY;
+GLint sky[20][20];
+GLint creepH[20][20];
+GLint creepB[20][20];
+GLint star[20][20];
+GLint moon[20][20];
+
+bool PigMove = true;     // 돼지 움직이는 상태
+bool BearMove = true;    //북극곰 움직이는 상태
+
+void BlockColorX(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, float PointSize, float PointLength) {  //블록 패tern
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0) glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            else if (ArrayBlock[i][j] == 1) glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2) glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+void cactusBlock(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, float PointSize, float PointLength) {  //블록 패tern
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0) glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            else if (ArrayBlock[i][j] == 1) glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2) glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            else if (ArrayBlock[i][j] == 3) glColor3f(0,0,0);
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void BlockColorY(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, double PointSize, double PointLength) {
+    for (int j = 1; j < 20; j++) {
+        for (int i = 1; i < 20; i++) {
+            if (ArrayBlock[i][j] == 0) glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            if (ArrayBlock[i][j] == 1) glColor3f(BlockR, BlockG, BlockB);
+            if (ArrayBlock[i][j] == 2) glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            i++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void VineLeaf(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, float PointSize, float PointLength) {  // 덩굴 블록 패턴
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0) glColor3f(0, 0.55, 1);
+            else if (ArrayBlock[i][j] == 1) glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2) glColor3f(0, 0.55, 1);
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void SteveColor(int ArrayBlock[8][8], float BlockX, float BlockY, double PointSize, double PointLength) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            if (ArrayBlock[i][j] == 1) glColor3f(0, 0, 0);
+            else if (ArrayBlock[i][j] == 0) glColor3f(0.39, 0.3, 0.24);
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void DiamondBlock(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, double PointSize, double PointLength) {
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0)
+                glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            else if (ArrayBlock[i][j] == 1)
+                glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2)
+                glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            else if (ArrayBlock[i][j] == 3)
+                glColor3f(0.2, 0.8, 0.9); // 다이아몬드 블록 색상 (밝은 파란색)
+
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void IronBlock(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, double PointSize, double PointLength) {
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0)
+                glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            else if (ArrayBlock[i][j] == 1)
+                glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2)
+                glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            else if (ArrayBlock[i][j] == 3)
+                glColor3f(0.72, 0.65, 0.5);
+
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void EmeraldBlock(int ArrayBlock[20][20], float BlockX, float BlockY, float BlockR, float BlockG, float BlockB, double PointSize, double PointLength) {
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (ArrayBlock[i][j] == 0)
+                glColor3f(BlockR - 0.1, BlockG - 0.1, BlockB - 0.1);
+            else if (ArrayBlock[i][j] == 1)
+                glColor3f(BlockR, BlockG, BlockB);
+            else if (ArrayBlock[i][j] == 2)
+                glColor3f(BlockR + 0.1, BlockG + 0.1, BlockB + 0.1);
+            else if (ArrayBlock[i][j] == 3)
+                glColor3f(0.31, 0.78, 0.47);
+
+            glPointSize(PointSize);
+            glBegin(GL_POINTS);
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+            j++;
+            glVertex2f((PointLength * i) + BlockX, (PointLength * j) + BlockY);
+        }
+        glEnd();
+    }
+}
+
+void MyTimer(int Value) {                //스티브 타이머
+    if(SceneNumber != 4){
+        SteveX += 0.005;
+        angle1 = angle1 + anglePlus;
+        angle2 = angle2 - anglePlus;
+        if (angle1> 30 || angle1 < -30) {
+            anglePlus = -anglePlus;
+        }
+        if (angle1 == 30 || angle1 == -30) {
+            anglePlus = -anglePlus;
+        }
+        if (SteveX < 1 && SceneNumber == 1)
+        {
+            SteveX += 0.004;
+            angle1 = 0;
+            angle2 = 0;
+        }
+        if (SteveX >= 1)
+        {
+            SteveX = 0;
+            if (SceneNumber < 4) { SceneNumber++; }
+        }
+    }
+    if(SceneNumber == 4)
+    {
+        if(SteveX < 0.4){
+            SteveX += 0.005;
+            angle1 = angle1 + anglePlus;
+            angle2 = angle2 - anglePlus;
+            if (angle1> 30 || angle1 < -30) {
+                anglePlus = -anglePlus;
+            }
+        }
+        else if(SteveX >= 0.4 && CreepX > -0.35)
+        {
+            CreepX -= 0.005;
+        }
+    }
+    
+    if (angle1 == 30 || angle1 == -30) anglePlus = -anglePlus;
+    //pig
+    if (PigMove == true)
+    {
+        PigX = PigX - 0.005;
+        pigangle1 = pigangle1 + anglePlus;
+        pigangle2 = pigangle2 - anglePlus;
+        if (PigX < 0.5) { PigMove = false; }
+    }
+
+    else if (PigMove == false)
+    {
+        pigangle1 = 0;
+        pigangle2 = 0;
+        pigangle3 = pigangle3 + piganglePlus;
+        if (pigangle3 == 45) { piganglePlus = 0; }
+    }
+
+    if (pigangle1 == 30 || pigangle1 == -30) { anglePlus = -anglePlus; }
+
+    //Scene Change
+    if (SceneNumber == 1)
+    {
+        SnowY = SnowY - 0.003;
+        if (BearMove == true)
+        {
+            BearX = BearX - 0.005;
+            bearangle1 = bearangle1 + anglePlus;
+            bearangle2 = bearangle2 - anglePlus;
+            if (bearangle1 == 30 || bearangle1 == -30) { anglePlus = -anglePlus; }
+            if (BearX < 1.2) {
+                BearMove = false;
+            }
+        }
+        else if (BearMove == false)
+        {
+            bearangle3 = bearangle3 - BearAnglePlus;
+            if (bearangle3 < -85) { BearAnglePlus = -BearAnglePlus; }
+            else if (bearangle3 > 0) {
+                BearMove = true;
+                bearangle3 = 0;
+            }
+        }
+    }
+
+    if (Timer < 250 && SceneNumber == 4)
+    {
+        Timer++;
+    }
+    if (Timer % 10) {
+        CloudX = CloudX + 0.0005;
+    }
+    BombSize = 0.001 + BombSize;
+    if (Timer > 165 && Timer < 175 || Timer > 185 && Timer < 195 || Timer > 205 && Timer < 215) {
+        CreepR = 1.2;
+        CreepG = 1.2;
+        CreepB = 1.2;
+        CreepPSize = 1;
+        CreepLSize = 0.0005;
+    }
+    else {
+        CreepPSize = 0;
+        CreepLSize = 0;
+        CreepR = 0.17;
+        CreepG = 0.8;
+        CreepB = 0;
+    }
+    if (Timer < 225) {
+        BombSize = 0;
+        BombX = 2;
+        BombY = 2;
+    }
+    else if (Timer >= 225 && Timer < 230)
+    {
+        BombSize = BombSize + 0.01;
+        BombX = 0.95;
+        BombY = 0.15;
+    }
+    else if (Timer > 230) {
+        BombSize = 0;
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(40, MyTimer, 1);
+}
+
+int random(int num) {            //랜덤함수
+    return rand() % num;
+}
+
+void mydisplay() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (SceneNumber == 0)          // 첫 화면
+    {
+        glViewport(0, 0, 800, 720);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glColor3f(0, 0.55, 1); //하늘
+        glBegin(GL_POLYGON);
+        glVertex2f(0, 0.07);
+        glVertex2f(0, 1);
+        glVertex2f(1, 1);
+        glVertex2f(1, 0.07);
+        glEnd();
+
+        for (float i = 0; i < 10; i = i + 0.09) {                           //잔디,흙
+            BlockColorX(glass, i, -0.01, 0, 0.4, 0, 6.0f, 0.005);
+            BlockColorX(dirt, i, -0.03, 0.35, 0.25, 0.15, 6.0f, 0.005);
+        }
+
+        for (float i = 0.092; i < 0.7; i = i + 0.09) {                      //나무
+            BlockColorX(wood2, -0.01, i, 0.23, 0.13, 0.02, 6.0f, 0.005);
+            BlockColorX(wood2, 0.088, i, 0.23, 0.13, 0.02, 6.0f, 0.005);
+        }
+
+        for (float i = 0.092; i < 1; i = i + 0.09) {                     //나무
+            BlockColorX(wood2, 0.688, i, 0.23, 0.13, 0.02, 6.0f, 0.005);
+            BlockColorX(wood2, 0.766, i, 0.23, 0.13, 0.02, 6.0f, 0.005);
+        }
+
+        for (float i = -0.03; i < 0.6; i = i + 0.09) {                     //잎
+            BlockColorX(leaf, i, 0.7, 0.133, 0.545, 0.133, 6.0f, 0.005);
+            BlockColorX(leaf, i, 0.8, 0.133, 0.545, 0.133, 6.0f, 0.005);
+            BlockColorX(leaf, i, 0.9, 0.133, 0.545, 0.133, 6.0f, 0.005);
+        }
+
+        for (float i = 0.1; i < 0.66; i = i + 0.1) {                      //덩굴
+            VineLeaf(vine, 0.3, i, 0.133, 0.445, 0.133, 6.0f, 0.005);
+            VineLeaf(vine, 0.4, i, 0.133, 0.445, 0.133, 6.0f, 0.005);
+            VineLeaf(vine, 0.5, i, 0.133, 0.445, 0.133, 6.0f, 0.005);
+        }
+
+        for (float i = 0.1; i < 1; i = i + 0.08) {                      //덩굴
+            VineLeaf(vine, 0.9, i, 0.133, 0.445, 0.133, 6.0f, 0.005);
+        }
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glPushMatrix();
+        glTranslatef(PigX - 0.05, 0.21, 0);  //돼지 얼굴
+        glRotatef(pigangle3, 0, 1, 0);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.09);
+
+        glTranslatef(-0.05, -0.01, 0.05);   //돼지 코
+        glColor3f(1, 0.68, 0.62);
+        glutSolidCube(0.04);
+
+        glTranslatef(0.009, 0.027, -0.05);   //돼지 눈 검1
+        glColor3f(0, 0, 0);
+        glutSolidCube(0.008);
+
+        glTranslatef(0, 0, 0.014);   //돼지 눈 흰1
+        glColor3f(1, 1, 1);
+        glutSolidCube(0.008);
+
+        glTranslatef(0, 0, 0.04);   //돼지 눈 흰2
+        glColor3f(1, 1, 1);
+        glutSolidCube(0.008);
+
+        glTranslatef(0, 0, 0.018);   //돼지 눈 검2
+        glColor3f(0, 0, 0);
+        glutSolidCube(0.008);
+
+        glTranslatef(-0.02, -0.025, -0.01);   //돼지 콧구멍
+        glColor3f(0.65, 0.16, 0.16);
+        glutSolidCube(0.01);
+
+        glTranslatef(0, 0, -0.03);   //돼지 콧구멍2
+        glColor3f(0.65, 0.16, 0.16);
+        glutSolidCube(0.01);
+        glPopMatrix();
+        glLoadIdentity();
+
+        glPushMatrix();
+        glTranslatef(PigX, 0.18, 0);   //돼지 몸 1
+        glRotatef(0, 0, 0, 0);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.08);
+        glEnd();
+
+        glTranslatef(0.06, 0, 0);   //돼지 몸 2
+        glRotatef(0, 0, 0, 0);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.08);
+        glPopMatrix();
+        glLoadIdentity();
+        glEnd();
+
+        glPushMatrix();
+        glTranslatef(PigX - 0.006, 0.14, 0);     //돼지 앞다리 1
+        glRotatef(pigangle1, 0, 0, 1);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.035);
+
+        glTranslatef(0, -0.031, 0);             //돼지 앞다리 2
+        glRotatef(0, 0, 0, 0);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.035);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(PigX + 0.06, 0.14, 0);     //돼지 뒷다리 1
+        glRotatef(pigangle2, 0, 0, 1);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.035);
+
+        glTranslatef(0, -0.031, 0);            //돼지 뒷다리 2
+        glRotatef(0, 0, 0, 0);
+        glColor3f(1, 0.63, 0.67);
+        glutSolidCube(0.035);
+        glPopMatrix();
+        glLoadIdentity();
+        glEnd();
+        glLoadIdentity();
+        
+        SteveColor(steveH,SteveX + 0.004,0.3,6.0f,0.0075);
+        BlockColorX(steveB,SteveX,0.233,0.078,0.72,0.78,3.0f,0.003);
+        BlockColorX(steveB,SteveX,0.183,0.078,0.72,0.78,3.0f,0.003);
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.17,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.16,0.16,0.4);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,0.05,0);
+            glRotatef(angle2 * 2,0,0,1);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.27,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.078,0.72,0.78);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glColor3f(0.39,0.3,0.24);
+            glutSolidCube(0.05);
+        glLoadIdentity();
+        glEnd();
+        glFlush();
+    }
+
+    else if (SceneNumber == 1)                   // 두번째 화면
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, 800, 720);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glColor3f(0, 0.45, 0.9); //하늘
+        glBegin(GL_POLYGON);
+        glVertex2f(0, 0.07);
+        glVertex2f(0, 1);
+        glVertex2f(1, 1);
+        glVertex2f(1, 0.07);
+        glEnd();
+
+        for (float i = 0; i < 10; i = i + 0.09) {                           //바다 ,얼음
+            BlockColorX(ice, i, 0, 0.55, 0.75, 0.94, 6.0f, 0.005);
+            BlockColorX(sea, i, 0.1, 0.17, 0.39, 1, 6.0f, 0.005);
+            BlockColorX(sea, i, 0.2, 0.17, 0.39, 1, 6.0f, 0.005);
+            BlockColorX(sea, i, 0.3, 0.17, 0.39, 1, 6.0f, 0.005);
+        }
+
+        for (float i = 0; i < 10; i = i + 0.09) {                           //눈,흙
+            BlockColorX(glass, i, 0.39, 1, 1, 1, 6.0f, 0.005);
+            BlockColorX(dirt, i, 0.37, 0.35, 0.25, 0.15, 6.0f, 0.005);
+        }
+
+        for (float i = 0.47; i < 0.7; i = i + 0.09) {                     //나무
+            BlockColorX(wood2, 0.45, i, 0.23, 0.13, 0.02, 6.0f, 0.005);
+        }
+
+        for (float i = 0.35; i < 0.6; i = i + 0.09) {                     //잎
+            BlockColorX(glass, i, 0.83, 1, 1, 1, 6.0f, 0.005);
+            BlockColorX(leaf, i, 0.7, 0.133, 0.545, 0.133, 6.0f, 0.005);
+            BlockColorX(leaf, i, 0.8, 0.133, 0.545, 0.133, 6.0f, 0.005);
+        }
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glPushMatrix();
+        glTranslatef(BearX - 0.5, 0.54, 0);     //북극곰 뒷다리 1
+        glRotatef(bearangle1, 0, 0, 1);
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.035);
+
+        glTranslatef(0, -0.031, 0);             //북극곰 뒷다리 2
+        glRotatef(0, 0, 0, 0);
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.035);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glPushMatrix();
+
+        glTranslatef(BearX - 0.5, 0.62, 0);        //북극곰 하체
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.15);
+        glPopMatrix();
+        glLoadIdentity();
+
+        glPushMatrix();                        //북극곰 허리 중심
+        glTranslatef(BearX - 0.5, 0.62, 0);
+        glRotatef(bearangle3, 0, 0, 1);
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.01);
+
+        glTranslatef(-0.11, -0.02, 0);     //북극곰 몸통
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.1);
+
+        glTranslatef(-0.07, -0.025, 0);     //북극곰 머리
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.05);
+
+        glTranslatef(-0.032, -0.015, 0);     //북극곰 코
+        glColor3f(0, 0, 0);
+        glutSolidCube(0.017);
+
+        glTranslatef(0.1, -0.02, 0);     //북극곰 앞다리 1
+        glRotatef(bearangle2, 0, 0, 1);
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.035);
+
+        glTranslatef(0, -0.031, 0);            //북극곰 앞다리 2
+        glRotatef(0, 0, 0, 0);
+        glColor3f(0.9, 0.9, 0.9);
+        glutSolidCube(0.035);
+        glPopMatrix();
+        glLoadIdentity();
+
+        for (float i = 0; i < 10; i += 0.05)                             //떨어지는 눈
+        {
+            for (float j = 0; j < 10; j += 0.1)
+            {
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
+                glPushMatrix();
+                glTranslatef(i, j + SnowY, 0);
+                glColor3f(1, 1, 1);
+                glutSolidCube(0.01);
+                glPopMatrix();
+            }
+
+        }
+        for (float i = 0.025; i < 10; i += 0.05)
+        {
+            for (float j = 0.25; j < 10; j += 0.1)
+            {
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
+                glPushMatrix();
+                glTranslatef(i, j + SnowY, 0);
+                glColor3f(1, 1, 1);
+                glutSolidCube(0.01);
+                glPopMatrix();
+                glLoadIdentity();
+            }
+            glEnd();
+        }
+        SteveColor(steveH,SteveX + 0.004,0.3,6.0f,0.0075);
+        BlockColorX(steveB,SteveX,0.233,0.078,0.72,0.78,3.0f,0.003);
+        BlockColorX(steveB,SteveX,0.183,0.078,0.72,0.78,3.0f,0.003);
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.17,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.16,0.16,0.4);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,0.05,0);
+            glRotatef(angle2 * 2,0,0,1);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.27,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.078,0.72,0.78);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glColor3f(0.39,0.3,0.24);
+            glutSolidCube(0.05);
+        glLoadIdentity();
+        glEnd();
+        glFlush();
+    }
+
+    else if (SceneNumber == 2)                   // 세번째 화면
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, 800, 720);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glColor3f(1, 0.87, 0); // 태양 / 배경이랑 겹치게 하여 강렬한 태양을 표현
+        glBegin(GL_POLYGON);
+        glVertex2f(0.4, 0.6);
+        glVertex2f(0.4, 0.8);
+        glVertex2f(0.6, 0.8);
+        glVertex2f(0.6, 0.6);
+
+        glColor3f(0, 0.65, 1); // 배경
+        glBegin(GL_POLYGON);
+        glVertex2f(0, 0.07);
+        glVertex2f(0, 1);
+        glVertex2f(1, 1);
+        glVertex2f(1, 0.07);
+        glEnd();
+        
+        for (double i = 0; i < 10; i = i + 0.09) {
+            BlockColorX(sand, i, -0.01, 0.9, 0.84, 0.42, 6.0f, 0.005);
+        }
+        cactusBlock(cactus,0.75,0.1,0.3, 0.8, 0.3,6.0f,0.005);
+        cactusBlock(cactus,0.75,0.2,0.3, 0.8, 0.3,6.0f,0.005);
+        cactusBlock(cactus,0.75,0.3,0.3, 0.8, 0.3,6.0f,0.005);
+        
+
+        glColor3f(0, 0, 0);
+        glBegin(GL_LINES);
+        glVertex2f(0.7, 0.2);
+        glVertex2f(0.8, 0.2);
+        glBegin(GL_LINES);
+        glVertex2f(0.7, 0.3);
+        glVertex2f(0.8, 0.3);
+        glEnd();
+
+        glColor3f(0.39, 0.26, 0.13);
+        glBegin(GL_LINE);
+        glVertex2f(0.15, 0.17);
+        glVertex2f(0.15, 0.1);
+
+        
+        SteveColor(steveH,SteveX + 0.004,0.3,6.0f,0.0075);
+        BlockColorX(steveB,SteveX,0.233,0.078,0.72,0.78,3.0f,0.003);
+        BlockColorX(steveB,SteveX,0.183,0.078,0.72,0.78,3.0f,0.003);
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.17,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.16,0.16,0.4);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,0.05,0);
+            glRotatef(angle2 * 2,0,0,1);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.27,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.078,0.72,0.78);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glColor3f(0.39,0.3,0.24);
+            glutSolidCube(0.05);
+        glLoadIdentity();
+        glEnd();
+
+        glFlush();
+        }
+
+    else if (SceneNumber == 3)                   // 네번째 화면
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, 800, 800);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        //돌 1행
+        BlockColorX(stone, 0.9, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.9, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.9, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.9, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.9, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.9, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 2행
+        BlockColorX(stone, 0.81, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.81, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.81, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.81, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.81, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        EmeraldBlock(emerald, 0.81, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 3행
+        BlockColorX(stone, 0.72, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.72, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.72, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.72, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.72, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.72, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 4행
+        BlockColorX(stone, 0.63, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.63, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        DiamondBlock(diamond, 0.63, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.63, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.63, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.63, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 5행
+        BlockColorX(stone, 0.54, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.54, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        DiamondBlock(diamond, 0.54, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        DiamondBlock(diamond, 0.54, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.54, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.54, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 6행
+        BlockColorX(stone, 0.45, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.45, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.45, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.45, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.45, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.45, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 7행
+        BlockColorX(stone, 0.36, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.36, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.36, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.36, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.36, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.36, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 8행
+        IronBlock(iron, 0.27, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.27, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.27, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.27, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.27, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.27, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 9행
+        IronBlock(iron, 0.18, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        IronBlock(iron, 0.18, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.18, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.18, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.18, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.18, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 10행
+        IronBlock(iron, 0.09, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        IronBlock(iron, 0.09, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.09, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.09, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.09, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.09, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //돌 11행
+        IronBlock(iron, 0.0, 0.8, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.0, 0.7, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.0, 0.6, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.0, 0.5, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.0, 0.4, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        BlockColorX(stone, 0.0, 0.0, 0.45, 0.45, 0.45, 6.0f, 0.005);
+
+        //기둥1
+        BlockColorX(rewood, 0.81, 0.3, 0.7, 0.55, 0.2, 6.0f, 0.005);
+        BlockColorX(wood, 0.81, 0.2, 0.55, 0.4, 0.15, 6.0f, 0.005);
+        BlockColorX(wood, 0.81, 0.1, 0.55, 0.4, 0.15, 6.0f, 0.005);
+
+        //기둥2
+        BlockColorX(rewood, 0.09, 0.3, 0.7, 0.55, 0.2, 6.0f, 0.005);
+        BlockColorX(wood, 0.09, 0.2, 0.55, 0.4, 0.15, 6.0f, 0.005);
+        BlockColorX(wood, 0.09, 0.1, 0.55, 0.4, 0.15, 6.0f, 0.005);
+
+        glEnd();
+        
+        SteveColor(steveH,SteveX + 0.004,0.3,6.0f,0.0075);
+        BlockColorX(steveB,SteveX,0.233,0.078,0.72,0.78,3.0f,0.003);
+        BlockColorX(steveB,SteveX,0.183,0.078,0.72,0.78,3.0f,0.003);
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.17,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.16,0.16,0.4);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,0.05,0);
+            glRotatef(angle2 * 2,0,0,1);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.27,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.078,0.72,0.78);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glColor3f(0.39,0.3,0.24);
+            glutSolidCube(0.05);
+        glLoadIdentity();
+        glEnd();
+
+        glFlush();
+    }
+
+    else if (SceneNumber == 4)                   // 다섯번째 화면
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, 800, 720);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        //backGround
+        glColor3f(0.1, 0.15, 0.3);
+        glBegin(GL_POLYGON);
+        glVertex2f(0, 0.07);
+        glVertex2f(0, 2);
+        glVertex2f(2, 2);
+        glVertex2f(2, 0.07);
+        glEnd();
+        //sky
+
+        for (double i = 0; i < 1.5; i = i + 0.1) {
+            for (double j = 0.8; j < 1.5; j = j + 0.09) {
+                BlockColorX(sky, i, j, 0.1, 0.15, 0.3, 7.0f, 0.008);
+            }
+        }
+        BlockColorX(star, 0.1, 0.79, 1, 1, 0, 2.0f, 0.0008);
+        BlockColorX(star, 0.3, 0.82, 1, 1, 0, 2.0f, 0.0008);
+        BlockColorX(star, 0.45, 0.85, 1, 1, 0, 2.0f, 0.0008);
+        BlockColorX(star, 0.62, 0.84, 1, 1, 0, 2.0f, 0.0008);
+        BlockColorX(star, 0.95, 0.88, 1, 1, 0, 2.0f, 0.0008);
+        BlockColorX(star, 0.9, 0.81, 1, 1, 0, 2.0f, 0.0008);
+
+        //moon
+        BlockColorX(moon, 0.2, 0.85, 0.95, 0.95, 0.95, 4.0f, 0.004);
+
+        //ground
+        for (double i = 0; i < 10; i = i + 0.09) {
+            BlockColorX(glass, i, -0.01, 0, 0.4, 0, 6.0f, 0.005);
+            BlockColorX(dirt, i, -0.03, 0.35, 0.25, 0.15, 6.0f, 0.005);
+        }
+
+        //creep
+        //head
+        BlockColorX(creepH, 1.2 + CreepX, 0.24, CreepR, CreepG, CreepB, 4.0f + CreepPSize, 0.004 + CreepLSize);
+        //body
+        BlockColorX(creepB, 1.215 + CreepX, 0.19, CreepR, CreepG, CreepB, 3.0f + CreepPSize, 0.0025 + CreepLSize);
+        BlockColorX(creepB, 1.215 + CreepX, 0.14, CreepR, CreepG, CreepB, 3.0f + CreepPSize, 0.0025 + CreepLSize);
+        BlockColorX(creepB, 1.19 + CreepX, 0.1, CreepR, CreepG, CreepB, 2.0f + CreepPSize, 0.002 + CreepLSize);
+        BlockColorX(creepB, 1.25 + CreepX, 0.1, CreepR, CreepG, CreepB, 2.0f + CreepPSize, 0.002 + CreepLSize);
+        SteveColor(steveH,SteveX + 0.004,0.3,6.0f,0.0075);
+        BlockColorX(steveB,SteveX,0.233,0.078,0.72,0.78,3.0f,0.003);
+        BlockColorX(steveB,SteveX,0.183,0.078,0.72,0.78,3.0f,0.003);
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.17,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.16,0.16,0.4);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,0.05,0);
+            glRotatef(angle2 * 2,0,0,1);
+            glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glutSolidCube(0.05);
+        glPopMatrix();
+        glLoadIdentity();
+        
+        glTranslatef(SteveX+0.03,0.27,0);
+        glRotatef(angle1,0,0,1);
+        glColor3f(0.078,0.72,0.78);
+        glutSolidCube(0.05);
+        
+        glPushMatrix();
+            glTranslatef(0,-0.05,0);
+            glColor3f(0.39,0.3,0.24);
+            glutSolidCube(0.05);
+        glLoadIdentity();
+        glEnd();
+        //house
+        for (double i = 0.398; i < 0.65; i = i + 0.1) {
+            for (double j = 0.095; j < 0.64; j = j + 0.09) {
+                BlockColorY(rewood, i, j, 0.7, 0.55, 0.2, 6.0f, 0.005);
+            }
+        }
+        for (double i = 0.205; i < 0.55; i = i + 0.09) {
+            BlockColorY(stone, i, i + 0.25, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        }
+        for (double i = 0.475; i > 0.205; i = i - 0.09) {
+            BlockColorY(stone, 0.995 - i, i + 0.25, 0.45, 0.45, 0.45, 6.0f, 0.005);
+        }
+        for (double i = 0.093; i < 0.5; i = i + 0.09) {
+            BlockColorX(wood, 0.3, i, 0.55, 0.4, 0.15, 6.0f, 0.005);
+            BlockColorX(wood, 0.7, i, 0.55, 0.4, 0.15, 6.0f, 0.005);
+        }
+        for (double i = 0.3; i < 0.7; i = i + 0.09) {
+            BlockColorX(wood, i, 0.45, 0.55, 0.4, 0.15, 6.0f, 0.005);
+        }
+        BlockColorX(cloud, CloudX - 0.03, 0.86, 0.85, 0.85, 0.85, 5.0f, 0.004);
+        BlockColorX(cloud, CloudX, 0.85, 0.85, 0.85, 0.85, 6.0f, 0.005);
+        BlockColorX(cloud, CloudX + 0.05, 0.86, 0.85, 0.85, 0.85, 5.0f, 0.004);
+
+        BlockColorX(cloud, CloudX + 0.77, 0.82, 0.85, 0.85, 0.85, 5.0f, 0.004);
+        BlockColorX(cloud, CloudX + 0.8, 0.81, 0.85, 0.85, 0.85, 6.0f, 0.005);
+        BlockColorX(cloud, CloudX + 0.85, 0.82, 0.85, 0.85, 0.85, 5.0f, 0.004);
+        
+        
+        if (Timer > 230) {
+            glClear(GL_COLOR_BUFFER_BIT);
+            for (double i = 0; i < 1; i = i + 0.09) {
+                for (double j = 0; j < 1; j = j + 0.09) {
+                    BlockColorX(dirt, i, j, 0.35, 0.25, 0.15, 6.0f, 0.005);
+                }
+            }
+            //font
+            glLineWidth(4.0f);
+            glBegin(GL_LINES);
+            glColor3f(1, 1, 1);
+            //Y
+            glVertex3f(0.27, 0.64, 0.0);
+            glVertex3f(0.3, 0.6, 0.0);
+
+            glVertex3f(0.3, 0.6, 0.0);
+            glVertex3f(0.33, 0.64, 0.0);
+
+            glVertex3f(0.3, 0.6, 0.0);
+            glVertex3f(0.3, 0.55, 0.0);
+            //O
+
+            glVertex3f(0.33, 0.6, 0.0);
+            glVertex3f(0.33, 0.55, 0.0);
+
+            glVertex3f(0.33, 0.55, 0.0);
+            glVertex3f(0.38, 0.55, 0.0);
+
+            glVertex3f(0.38, 0.55, 0.0);
+            glVertex3f(0.38, 0.6, 0.0);
+
+            glVertex3f(0.38, 0.6, 0.0);
+            glVertex3f(0.33, 0.6, 0.0);
+
+            //U
+            glVertex3f(0.4, 0.6, 0.0);
+            glVertex3f(0.4, 0.55, 0.0);
+
+            glVertex3f(0.4, 0.55, 0.0);
+            glVertex3f(0.45, 0.55, 0.0);
+
+            glVertex3f(0.45, 0.55, 0.0);
+            glVertex3f(0.45, 0.6, 0.0);
+
+            //d
+            glVertex3f(0.5, 0.6, 0.0);
+            glVertex3f(0.5, 0.55, 0.0);
+
+            glVertex3f(0.5, 0.55, 0.0);
+            glVertex3f(0.55, 0.55, 0.0);
+
+            glVertex3f(0.55, 0.55, 0.0);
+            glVertex3f(0.55, 0.65, 0.0);
+
+            glVertex3f(0.55, 0.6, 0.0);
+            glVertex3f(0.5, 0.6, 0.0);
+            glEnd();
+            //i
+            glPointSize(4.0f);
+            glBegin(GL_POINTS);
+            glVertex2f(0.58, 0.62);
+            glEnd();
+            glBegin(GL_LINES);
+            glVertex3f(0.58, 0.6, 0.0);
+            glVertex3f(0.58, 0.55, 0.0);
+
+            //e
+            glVertex3f(0.6, 0.6, 0.0);
+            glVertex3f(0.6, 0.55, 0.0);
+
+            glVertex3f(0.6, 0.6, 0.0);
+            glVertex3f(0.65, 0.6, 0.0);
+
+            glVertex3f(0.65, 0.6, 0.0);
+            glVertex3f(0.65, 0.58, 0.0);
+
+            glVertex3f(0.65, 0.58, 0.0);
+            glVertex3f(0.6, 0.58, 0.0);
+
+            glVertex3f(0.6, 0.55, 0.0);
+            glVertex3f(0.65, 0.55, 0.0);
+
+            //d
+            glVertex3f(0.68, 0.6, 0.0);
+            glVertex3f(0.68, 0.55, 0.0);
+
+            glVertex3f(0.68, 0.55, 0.0);
+            glVertex3f(0.73, 0.55, 0.0);
+
+            glVertex3f(0.73, 0.55, 0.0);
+            glVertex3f(0.73, 0.65, 0.0);
+
+            glVertex3f(0.73, 0.6, 0.0);
+            glVertex3f(0.68, 0.6, 0.0);
+
+            glEnd();
+
+            //button
+            glBegin(GL_POLYGON);
+            glColor3f(0.5, 0.5, 0.5);
+            glVertex3f(0.2, 0.3, 0.0);
+            glVertex3f(0.2, 0.38, 0.0);
+
+            glVertex3f(0.2, 0.38, 0.0);
+            glVertex3f(0.8, 0.38, 0.0);
+
+            glVertex3f(0.8, 0.38, 0.0);
+            glVertex3f(0.8, 0.3, 0.0);
+
+            glVertex3f(0.8, 0.3, 0.0);
+            glVertex3f(0.2, 0.3, 0.0);
+
+            glEnd();
+
+            glLineWidth(3.0f);
+            glBegin(GL_LINES);
+            glColor3f(0, 0, 0);
+            glVertex3f(0.2, 0.3, 0.0);
+            glVertex3f(0.2, 0.38, 0.0);
+
+            glVertex3f(0.2, 0.38, 0.0);
+            glVertex3f(0.8, 0.38, 0.0);
+
+            glVertex3f(0.8, 0.38, 0.0);
+            glVertex3f(0.8, 0.3, 0.0);
+
+            glVertex3f(0.8, 0.3, 0.0);
+            glVertex3f(0.2, 0.3, 0.0);
+            glEnd();
+
+            glBegin(GL_POLYGON);
+            glColor3f(0.5, 0.5, 0.5);
+            glVertex3f(0.2, 0.2, 0.0);
+            glVertex3f(0.2, 0.28, 0.0);
+
+            glVertex3f(0.2, 0.28, 0.0);
+            glVertex3f(0.8, 0.28, 0.0);
+
+            glVertex3f(0.8, 0.28, 0.0);
+            glVertex3f(0.8, 0.2, 0.0);
+
+            glVertex3f(0.8, 0.2, 0.0);
+            glVertex3f(0.2, 0.2, 0.0);
+
+            glEnd();
+            glBegin(GL_LINES);
+            glColor3f(0, 0, 0);
+            glVertex3f(0.2, 0.2, 0.0);
+            glVertex3f(0.2, 0.28, 0.0);
+
+            glVertex3f(0.2, 0.28, 0.0);
+            glVertex3f(0.8, 0.28, 0.0);
+
+            glVertex3f(0.8, 0.28, 0.0);
+            glVertex3f(0.8, 0.2, 0.0);
+
+            glVertex3f(0.8, 0.2, 0.0);
+            glVertex3f(0.2, 0.2, 0.0);
+
+
+            //button font
+            //r
+            glColor3f(1, 1, 1);
+
+            glVertex3f(0.41, 0.32, 0.0);
+            glVertex3f(0.41, 0.36, 0.0);
+
+            glVertex3f(0.41, 0.36, 0.0);
+            glVertex3f(0.43, 0.36, 0.0);
+
+            glVertex3f(0.43, 0.36, 0.0);
+            glVertex3f(0.43, 0.345, 0.0);
+
+            glVertex3f(0.43, 0.345, 0.0);
+            glVertex3f(0.41, 0.345, 0.0);
+
+            glVertex3f(0.41, 0.345, 0.0);
+            glVertex3f(0.43, 0.32, 0.0);
+
+            //e
+            glVertex3f(0.44, 0.34, 0.0);
+            glVertex3f(0.44, 0.32, 0.0);
+
+            glVertex3f(0.44, 0.34, 0.0);
+            glVertex3f(0.46, 0.34, 0.0);
+
+            glVertex3f(0.46, 0.34, 0.0);
+            glVertex3f(0.46, 0.33, 0.0);
+
+            glVertex3f(0.46, 0.33, 0.0);
+            glVertex3f(0.44, 0.33, 0.0);
+
+            glVertex3f(0.44, 0.32, 0.0);
+            glVertex3f(0.46, 0.32, 0.0);
+
+            //s
+            glVertex3f(0.49, 0.34, 0.0);
+            glVertex3f(0.47, 0.34, 0.0);
+
+            glVertex3f(0.47, 0.34, 0.0);
+            glVertex3f(0.47, 0.33, 0.0);
+
+            glVertex3f(0.47, 0.33, 0.0);
+            glVertex3f(0.49, 0.33, 0.0);
+
+            glVertex3f(0.49, 0.33, 0.0);
+            glVertex3f(0.49, 0.32, 0.0);
+
+            glVertex3f(0.49, 0.33, 0.0);
+            glVertex3f(0.49, 0.32, 0.0);
+
+            glVertex3f(0.49, 0.32, 0.0);
+            glVertex3f(0.47, 0.32, 0.0);
+
+            //p
+            glVertex3f(0.5, 0.34, 0.0);
+            glVertex3f(0.5, 0.31, 0.0);
+
+            glVertex3f(0.5, 0.34, 0.0);
+            glVertex3f(0.52, 0.34, 0.0);
+
+            glVertex3f(0.52, 0.34, 0.0);
+            glVertex3f(0.52, 0.325, 0.0);
+
+            glVertex3f(0.52, 0.325, 0.0);
+            glVertex3f(0.5, 0.325, 0.0);
+
+            //a
+            glVertex3f(0.53, 0.34, 0.0);
+            glVertex3f(0.55, 0.34, 0.0);
+
+            glVertex3f(0.55, 0.34, 0.0);
+            glVertex3f(0.55, 0.32, 0.0);
+
+            glVertex3f(0.55, 0.32, 0.0);
+            glVertex3f(0.53, 0.32, 0.0);
+
+            glVertex3f(0.53, 0.32, 0.0);
+            glVertex3f(0.53, 0.33, 0.0);
+
+            glVertex3f(0.53, 0.33, 0.0);
+            glVertex3f(0.55, 0.33, 0.0);
+
+            //w
+            glVertex3f(0.56, 0.34, 0.0);
+            glVertex3f(0.565, 0.32, 0.0);
+
+            glVertex3f(0.565, 0.32, 0.0);
+            glVertex3f(0.57, 0.34, 0.0);
+
+            glVertex3f(0.57, 0.34, 0.0);
+            glVertex3f(0.575, 0.32, 0.0);
+
+            glVertex3f(0.575, 0.32, 0.0);
+            glVertex3f(0.58, 0.34, 0.0);
+
+            //n
+            glVertex3f(0.59, 0.34, 0.0);
+            glVertex3f(0.59, 0.32, 0.0);
+
+            glVertex3f(0.59, 0.34, 0.0);
+            glVertex3f(0.605, 0.34, 0.0);
+
+            glVertex3f(0.605, 0.34, 0.0);
+            glVertex3f(0.605, 0.32, 0.0);
+
+            //T
+            glVertex3f(0.44, 0.26, 0.0);
+            glVertex3f(0.48, 0.26, 0.0);
+
+            glVertex3f(0.46, 0.22, 0.0);
+            glVertex3f(0.46, 0.26, 0.0);
+
+            glEnd();
+            //i
+            glBegin(GL_POINTS);
+
+            glVertex3f(0.49, 0.26, 0.0);
+
+            glEnd();
+
+            glBegin(GL_LINES);
+            glVertex3f(0.49, 0.22, 0.0);
+            glVertex3f(0.49, 0.25, 0.0);
+            //t
+            glVertex3f(0.5, 0.25, 0.0);
+            glVertex3f(0.53, 0.25, 0.0);
+
+            glVertex3f(0.515, 0.22, 0.0);
+            glVertex3f(0.515, 0.26, 0.0);
+
+            glVertex3f(0.515, 0.22, 0.0);
+            glVertex3f(0.53, 0.22, 0.0);
+
+            //l
+            glVertex3f(0.54, 0.22, 0.0);
+            glVertex3f(0.54, 0.26, 0.0);
+
+            //e
+            glVertex3f(0.55, 0.24, 0.0);
+            glVertex3f(0.55, 0.22, 0.0);
+
+            glVertex3f(0.55, 0.24, 0.0);
+            glVertex3f(0.57, 0.24, 0.0);
+
+            glVertex3f(0.57, 0.24, 0.0);
+            glVertex3f(0.57, 0.23, 0.0);
+
+            glVertex3f(0.57, 0.23, 0.0);
+            glVertex3f(0.55, 0.23, 0.0);
+
+            glVertex3f(0.55, 0.22, 0.0);
+            glVertex3f(0.57, 0.22, 0.0);
+        }
+        glColor3f(1, 1, 1);
+        glTranslatef(BombX, BombY, 0);
+        for (int i = 0; i < 12; i++) {
+            glutSolidSphere(BombSize * 10, 10, 20);
+            glTranslatef(BombSize * 0.01, 0.02, 0);
+            glRotatef(30, 0, 0, 1);
+        }
+        glEnd();
+
+        glFlush();
+    }
+
+    if (SceneNumber == 2) {
+        gluLookAt(0.8, 0.23, 0.8, 0.25, 0.1, 0.0, -0.4, -1, 0);                // 음수라 역전해서 생성
+
+        int idx[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int idx0 = idx[i][0];
+            int idx1 = idx[i][1];
+            int idx2 = idx[i][2];
+            int idx3 = idx[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitHead[idx0]);
+            glVertex3fv(RabbitHead[idx1]);
+            glVertex3fv(RabbitHead[idx2]);
+            glVertex3fv(RabbitHead[idx3]);
+            glEnd();
+        }
+
+        int LEar[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int LEar0 = LEar[i][0];
+            int LEar1 = LEar[i][1];
+            int LEar2 = LEar[i][2];
+            int LEar3 = LEar[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitLeftEar[LEar0]);
+            glVertex3fv(RabbitLeftEar[LEar1]);
+            glVertex3fv(RabbitLeftEar[LEar2]);
+            glVertex3fv(RabbitLeftEar[LEar3]);
+            glEnd();
+        }
+
+        int REar[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int REar0 = REar[i][0];
+            int REar1 = REar[i][1];
+            int REar2 = REar[i][2];
+            int REar3 = REar[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitRightEar[REar0]);
+            glVertex3fv(RabbitRightEar[REar1]);
+            glVertex3fv(RabbitRightEar[REar2]);
+            glVertex3fv(RabbitRightEar[REar3]);
+            glEnd();
+        }
+
+        int Larm[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int Larm0 = Larm[i][0];
+            int Larm1 = Larm[i][1];
+            int Larm2 = Larm[i][2];
+            int Larm3 = Larm[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitLeftarm[Larm0]);
+            glVertex3fv(RabbitLeftarm[Larm1]);
+            glVertex3fv(RabbitLeftarm[Larm2]);
+            glVertex3fv(RabbitLeftarm[Larm3]);
+            glEnd();
+        }
+
+        int Body[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int Body0 = Body[i][0];
+            int Body1 = Body[i][1];
+            int Body2 = Body[i][2];
+            int Body3 = Body[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitBody[Body0]);
+            glVertex3fv(RabbitBody[Body1]);
+            glVertex3fv(RabbitBody[Body2]);
+            glVertex3fv(RabbitBody[Body3]);
+            glEnd();
+        }
+
+        int Rarm[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int Rarm0 = Rarm[i][0];
+            int Rarm1 = Rarm[i][1];
+            int Rarm2 = Rarm[i][2];
+            int Rarm3 = Rarm[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitRightarm[Rarm0]);
+            glVertex3fv(RabbitRightarm[Rarm1]);
+            glVertex3fv(RabbitRightarm[Rarm2]);
+            glVertex3fv(RabbitRightarm[Rarm3]);
+            glEnd();
+        }
+
+        int Rfoot[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int Rfoot0 = Rfoot[i][0];
+            int Rfoot1 = Rfoot[i][1];
+            int Rfoot2 = Rfoot[i][2];
+            int Rfoot3 = Rfoot[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitRightfoot[Rfoot0]);
+            glVertex3fv(RabbitRightfoot[Rfoot1]);
+            glVertex3fv(RabbitRightfoot[Rfoot2]);
+            glVertex3fv(RabbitRightfoot[Rfoot3]);
+            glEnd();
+        }
+
+        int Lfoot[6][4] = { {0, 3, 2, 1}, {2, 3, 7, 6}, {7, 4, 5, 6}, {1, 2, 6, 5}, {0, 3, 7, 4}, {0, 4, 5, 1} };
+        for (int i = 0; i < 6; i++) {
+            int Lfoot0 = Lfoot[i][0];
+            int Lfoot1 = Lfoot[i][1];
+            int Lfoot2 = Lfoot[i][2];
+            int Lfoot3 = Lfoot[i][3];
+
+            glColor3f(0.96, 0.72, 0.42);
+            glBegin(GL_POLYGON);
+            glVertex3fv(RabbitLeftfoot[Lfoot0]);
+            glVertex3fv(RabbitLeftfoot[Lfoot1]);
+            glVertex3fv(RabbitLeftfoot[Lfoot2]);
+            glVertex3fv(RabbitLeftfoot[Lfoot3]);
+            glEnd();
+        }
+   }
+    glFlush();
+}
+
+void MyReshape(int NewWidth, int NewHeight) {
+    glViewport(0, 0, NewWidth, NewHeight);
+
+    GLfloat WidthFactor = (GLfloat)NewWidth / (GLfloat)800;
+    GLfloat HeightFactor = (GLfloat)NewWidth / (GLfloat)800;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glOrtho(0.0 * WidthFactor, 1.0 * WidthFactor, 0.0 * HeightFactor, 1.0 * HeightFactor, -2.0, 2.0);
+}
+
+int main(int argc, char* argv[]) {
+    glutInit(&argc, argv);
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 20; j++) {
+            dirt[i][j] = random(3);
+            glass[i][j] = random(3);
+            wood2[i][j] = random(3);
+            leaf[i][j] = random(3);
+            vine[i][j] = random(3);
+            sea[i][j] = random(3);
+            ice[i][j] = random(3);
+            stone[i][j] = random(3);
+            wood[i][j] = random(3);
+            diamond[i][j] = random(4);
+            iron[i][j] = random(4);
+            emerald[i][j] = random(4);
+            creepH[i][j] = random(3);
+            creepB[i][j] = random(3);
+            star[i][j] = random(3);
+            sky[i][j] = random(2);
+            moon[i][j] = random(3);
+            cloud[i][j] = random(2);
+            sand[i][j] = random(3);
+            cactus[i][j] = random(2);
+        }
+    }
+
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 20; j++) {
+            if (j == 5 || j == 12 || j == 18 || i == 3 && j < 5 || i == 7 && j >= 5 && j < 12 || i == 15 && j >12) { rewood[i][j] = 0; }
+            else {
+                rewood[i][j] = 1;
+            }
+        }
+    }
+    
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 20; j++) {
+            if(i == 1 || i == 10 || i == 19)
+            cactus[i][j] = 3;
+        }
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 4; j < 8; j++) {
+            steveH[i][j] = 1;
+        }
+    }
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 4; j++) {
+            steveH[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 2; j < 4; j++) {
+            steveH[i][j] = 1;
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        steveH[i][1] = 1;
+    }
+
+    steveH[7][3] = 1;
+
+    glutInitWindowSize(800, 720);
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow("Come Back Home");
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+
+    glutDisplayFunc(mydisplay);
+    glutTimerFunc(40, MyTimer, 1);
+    glutReshapeFunc(MyReshape);
+    glutMainLoop();
+
+    return 0;
+}
